@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car/Bike Mileage Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0074e4, #00a2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #0074e4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .currency-selector {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 20px;
+        }
+        
+        .currency-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #e6f0ff;
+            transition: all 0.3s;
+        }
+        
+        .currency-option.active {
+            background: #0074e4;
+            color: white;
+        }
+        
+        .currency-option input {
+            display: none;
+        }
+        
+        .calculator {
+            padding: 25px;
+        }
+        
+        .vehicle-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .vehicle-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .vehicle-option.active {
+            border-color: #0074e4;
+            background: #e6f0ff;
+        }
+        
+        .vehicle-option i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #0074e4;
+        }
+        
+        .vehicle-option p {
+            font-weight: 600;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0074e4;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-wrapper input:focus {
+            border-color: #0074e4;
+            outline: none;
+        }
+        
+        .input-wrapper .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+            font-weight: 600;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #calculate-btn {
+            background: #0074e4;
+            color: white;
+        }
+        
+        #calculate-btn:hover {
+            background: #005bb7;
+        }
+        
+        #clear-btn {
+            background: #f2f2f2;
+            color: #333;
+        }
+        
+        #clear-btn:hover {
+            background: #e6e6e6;
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result h3 {
+            color: #0074e4;
+            margin-bottom: 10px;
+        }
+        
+        .mileage {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0074e4;
+            margin: 10px 0;
+        }
+        
+        .details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .detail-box {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .detail-box h4 {
+            color: #0074e4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-box p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .icon {
+            font-size: 22px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            .vehicle-type {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .details {
+                flex-direction: column;
+            }
+            
+            .detail-box {
+                margin-bottom: 15px;
+            }
+            
+            .mileage {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-gas-pump icon"></i>Mileage Calculator</h1>
+            <p>Calculate your vehicle's fuel efficiency</p>
+        </div>
+        
+        <div class="currency-selector">
+            <label class="currency-option active" id="usd-option">
+                <input type="radio" name="currency" value="usd" checked> 
+                <i class="fas fa-dollar-sign"></i> USD
+            </label>
+            <label class="currency-option" id="inr-option">
+                <input type="radio" name="currency" value="inr"> 
+                <i class="fas fa-rupee-sign"></i> INR
+            </label>
+        </div>
+        
+        <div class="calculator">
+            <div class="vehicle-type">
+                <div class="vehicle-option active" id="car-option">
+                    <i class="fas fa-car"></i>
+                    <p>Car</p>
+                </div>
+                <div class="vehicle-option" id="bike-option">
+                    <i class="fas fa-motorcycle"></i>
+                    <p>Bike</p>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="distance"><i class="fas fa-road icon"></i>Distance Traveled</label>
+                <div class="input-wrapper">
+                    <input type="number" id="distance" placeholder="Enter distance">
+                    <span class="unit">km</span>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="fuel"><i class="fas fa-gas-pump icon"></i>Fuel Used</label>
+                <div class="input-wrapper">
+                    <input type="number" id="fuel" placeholder="Enter fuel amount">
+                    <span class="unit">L</span>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="fuel-price"><i class="fas fa-dollar-sign icon"></i>Fuel Price (optional)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="fuel-price" placeholder="Enter price per liter" step="0.01">
+                    <span class="unit" id="price-unit">$/L</span>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn">Calculate Mileage</button>
+                <button id="clear-btn">Clear</button>
+            </div>
+            
+            <div class="result" id="result">
+                <h3>Your Vehicle's Mileage</h3>
+                <div class="mileage" id="mileage-value">0 km/L</div>
+                
+                <div class="details">
+                    <div class="detail-box">
+                        <h4>Cost per km</h4>
+                        <p id="cost-km">$0.00</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Fuel Efficiency</h4>
+                        <p id="efficiency">0.00 L/100km</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const carOption = document.getElementById('car-option');
+            const bikeOption = document.getElementById('bike-option');
+            const distanceInput = document.getElementById('distance');
+            const fuelInput = document.getElementById('fuel');
+            const fuelPriceInput = document.getElementById('fuel-price');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultDiv = document.getElementById('result');
+            const mileageValue = document.getElementById('mileage-value');
+            const costKm = document.getElementById('cost-km');
+            const efficiency = document.getElementById('efficiency');
+            const usdOption = document.getElementById('usd-option');
+            const inrOption = document.getElementById('inr-option');
+            const priceUnit = document.getElementById('price-unit');
+            
+            // Set initial values
+            let vehicleType = 'car';
+            let currency = 'usd';
+            let currencySymbol = '$';
+            
+            // Vehicle type selection
+            carOption.addEventListener('click', function() {
+                vehicleType = 'car';
+                carOption.classList.add('active');
+                bikeOption.classList.remove('active');
+            });
+            
+            bikeOption.addEventListener('click', function() {
+                vehicleType = 'bike';
+                bikeOption.classList.add('active');
+                carOption.classList.remove('active');
+            });
+            
+            // Currency selection
+            usdOption.addEventListener('click', function() {
+                currency = 'usd';
+                currencySymbol = '$';
+                priceUnit.textContent = '$/L';
+                updateCurrencyDisplay();
+                usdOption.classList.add('active');
+                inrOption.classList.remove('active');
+            });
+            
+            inrOption.addEventListener('click', function() {
+                currency = 'inr';
+                currencySymbol = '₹';
+                priceUnit.textContent = '₹/L';
+                updateCurrencyDisplay();
+                inrOption.classList.add('active');
+                usdOption.classList.remove('active');
+            });
+            
+            function updateCurrencyDisplay() {
+                // Update cost display if it's already shown
+                if (resultDiv.style.display === 'block') {
+                    calculateMileage();
+                }
+            }
+            
+            // Format currency based on selection
+            function formatCurrency(amount) {
+                if (currency === 'inr') {
+                    return '₹' + amount.toLocaleString('en-IN', {maximumFractionDigits: 2});
+                } else {
+                    return '$' + amount.toLocaleString('en-US', {maximumFractionDigits: 2});
+                }
+            }
+            
+            // Calculate mileage on button click
+            calculateBtn.addEventListener('click', calculateMileage);
+            
+            function calculateMileage() {
+                const distance = parseFloat(distanceInput.value);
+                const fuel = parseFloat(fuelInput.value);
+                const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+                
+                // Validate inputs
+                if (isNaN(distance) || isNaN(fuel) || distance <= 0 || fuel <= 0) {
+                    alert("Please enter valid values for distance and fuel (must be greater than 0)");
+                    return;
+                }
+                
+                // Calculate mileage
+                const mileage = distance / fuel;
+                const efficiencyValue = (fuel / distance) * 100;
+                const costPerKm = fuelPrice > 0 ? (fuelPrice * fuel) / distance : 0;
+                
+                // Display results
+                mileageValue.textContent = `${mileage.toFixed(2)} km/L`;
+                efficiency.textContent = `${efficiencyValue.toFixed(2)} L/100km`;
+                costKm.textContent = fuelPrice > 0 ? formatCurrency(costPerKm) : 'N/A';
+                
+                // Show result section
+                resultDiv.style.display = 'block';
+            }
+            
+            // Clear inputs
+            clearBtn.addEventListener('click', function() {
+                distanceInput.value = '';
+                fuelInput.value = '';
+                fuelPriceInput.value = '';
+                resultDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
