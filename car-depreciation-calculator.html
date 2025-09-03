@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Depreciation Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0074e4, #00a2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #0074e4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .calculator {
+            padding: 25px;
+        }
+        
+        .currency-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        
+        .currency-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: #e6f0ff;
+            transition: all 0.3s;
+        }
+        
+        .currency-option.active {
+            background: #0074e4;
+            color: white;
+        }
+        
+        .currency-option input {
+            display: none;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        .input-section h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e6f0ff;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .input-group label {
+            flex: 1;
+            font-weight: 600;
+            color: #0074e4;
+        }
+        
+        .input-wrapper {
+            flex: 2;
+            position: relative;
+        }
+        
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #0074e4;
+            outline: none;
+        }
+        
+        .input-wrapper .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+            font-weight: 600;
+        }
+        
+        .input-wrapper .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+            font-weight: 600;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #calculate-btn {
+            background: #0074e4;
+            color: white;
+        }
+        
+        #calculate-btn:hover {
+            background: #005bb7;
+        }
+        
+        #clear-btn {
+            background: #f2f2f2;
+            color: #333;
+        }
+        
+        #clear-btn:hover {
+            background: #e6e6e6;
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .depreciation-chart {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 15%;
+            background: #0074e4;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            position: relative;
+            transition: height 1s ease;
+        }
+        
+        .chart-bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: 600;
+            color: #0074e4;
+        }
+        
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .detail-box {
+            flex-basis: 48%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #e6f0ff;
+            border-radius: 8px;
+        }
+        
+        .detail-box h4 {
+            color: #0074e4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-box p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 22px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .input-wrapper {
+                width: 100%;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .details {
+                flex-direction: column;
+            }
+            
+            .detail-box {
+                flex-basis: 100%;
+            }
+            
+            .chart-bar {
+                width: 12%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line icon"></i>Car Depreciation Calculator</h1>
+            <p>Calculate how your car's value decreases over time</p>
+        </div>
+        
+        <div class="calculator">
+            <div class="currency-selector">
+                <label class="currency-option active" id="usd-option">
+                    <input type="radio" name="currency" value="usd" checked> 
+                    <i class="fas fa-dollar-sign"></i> USD
+                </label>
+                <label class="currency-option" id="inr-option">
+                    <input type="radio" name="currency" value="inr"> 
+                    <i class="fas fa-rupee-sign"></i> INR
+                </label>
+            </div>
+            
+            <div class="input-section">
+                <h3><i class="fas fa-car"></i> Vehicle Details</h3>
+                
+                <div class="input-group">
+                    <label for="purchase-price"><i class="fas fa-tag"></i> Purchase Price</label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol" id="price-symbol">$</span>
+                        <input type="number" id="purchase-price" placeholder="Enter purchase price" value="25000">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="car-age"><i class="fas fa-calendar-alt"></i> Current Age (years)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="car-age" placeholder="Enter car age" value="3" min="0" max="30">
+                        <span class="unit">years</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="depreciation-rate"><i class="fas fa-percent"></i> Annual Depreciation Rate</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="depreciation-rate" placeholder="Enter depreciation rate" value="15" step="0.1" min="5" max="50">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="years"><i class="fas fa-clock"></i> Projection Period</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="years" placeholder="Enter years to project" value="5" min="1" max="20">
+                        <span class="unit">years</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn">Calculate Depreciation</button>
+                <button id="clear-btn">Clear</button>
+            </div>
+            
+            <div class="result" id="result">
+                <h3>Depreciation Projection</h3>
+                
+                <div class="depreciation-chart" id="depreciation-chart">
+                    <!-- Chart will be generated by JavaScript -->
+                </div>
+                
+                <div class="details">
+                    <div class="detail-box">
+                        <h4>Current Value</h4>
+                        <p id="current-value">$0.00</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Total Depreciation</h4>
+                        <p id="total-depreciation">$0.00</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Future Value</h4>
+                        <p id="future-value">$0.00</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Annual Depreciation</h4>
+                        <p id="annual-depreciation">$0.00</p>
+                    </div>
+                </div>
+                
+                <p class="info-text">Depreciation is highest in the first few years and varies by vehicle make, model, and market conditions.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const usdOption = document.getElementById('usd-option');
+            const inrOption = document.getElementById('inr-option');
+            const priceSymbol = document.getElementById('price-symbol');
+            const purchasePriceInput = document.getElementById('purchase-price');
+            const carAgeInput = document.getElementById('car-age');
+            const depreciationRateInput = document.getElementById('depreciation-rate');
+            const yearsInput = document.getElementById('years');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultDiv = document.getElementById('result');
+            const depreciationChart = document.getElementById('depreciation-chart');
+            const currentValue = document.getElementById('current-value');
+            const totalDepreciation = document.getElementById('total-depreciation');
+            const futureValue = document.getElementById('future-value');
+            const annualDepreciation = document.getElementById('annual-depreciation');
+            
+            // Set initial values
+            let currency = 'usd';
+            let currencySymbol = '$';
+            let conversionRate = 75; // USD to INR conversion rate
+            
+            // Currency selection
+            usdOption.addEventListener('click', function() {
+                currency = 'usd';
+                currencySymbol = '$';
+                priceSymbol.textContent = '$';
+                updateCurrencyDisplay();
+                usdOption.classList.add('active');
+                inrOption.classList.remove('active');
+            });
+            
+            inrOption.addEventListener('click', function() {
+                currency = 'inr';
+                currencySymbol = '₹';
+                priceSymbol.textContent = '₹';
+                updateCurrencyDisplay();
+                inrOption.classList.add('active');
+                usdOption.classList.remove('active');
+            });
+            
+            function updateCurrencyDisplay() {
+                // Update purchase price placeholder and default based on currency
+                if (currency === 'inr') {
+                    purchasePriceInput.placeholder = "Enter purchase price";
+                    if (purchasePriceInput.value === "25000") {
+                        purchasePriceInput.value = "500000";
+                    }
+                } else {
+                    purchasePriceInput.placeholder = "Enter purchase price";
+                    if (purchasePriceInput.value === "500000") {
+                        purchasePriceInput.value = "25000";
+                    }
+                }
+                
+                // Recalculate if results are already shown
+                if (resultDiv.style.display === 'block') {
+                    calculateDepreciation();
+                }
+            }
+            
+            // Format currency based on selection
+            function formatCurrency(amount) {
+                if (currency === 'inr') {
+                    // Convert if amount is in USD (assuming calculations are done in USD)
+                    const inrAmount = amount * conversionRate;
+                    
+                    // Indian formatting (lakhs and crores)
+                    if (inrAmount >= 10000000) {
+                        return '₹' + (inrAmount / 10000000).toFixed(2) + ' Cr';
+                    } else if (inrAmount >= 100000) {
+                        return '₹' + (inrAmount / 100000).toFixed(2) + ' L';
+                    } else {
+                        return '₹' + inrAmount.toLocaleString('en-IN', {maximumFractionDigits: 0});
+                    }
+                } else {
+                    // US formatting
+                    if (amount >= 1000000) {
+                        return '$' + (amount / 1000000).toFixed(2) + 'M';
+                    } else if (amount >= 1000) {
+                        return '$' + (amount / 1000).toFixed(1) + 'K';
+                    } else {
+                        return '$' + amount.toLocaleString('en-US', {maximumFractionDigits: 0});
+                    }
+                }
+            }
+            
+            // Calculate depreciation on button click
+            calculateBtn.addEventListener('click', calculateDepreciation);
+            
+            function calculateDepreciation() {
+                // Get input values
+                let purchasePrice = parseFloat(purchasePriceInput.value);
+                const carAge = parseInt(carAgeInput.value);
+                const depreciationRate = parseFloat(depreciationRateInput.value);
+                const years = parseInt(yearsInput.value);
+                
+                // Convert purchase price to USD for calculations if in INR
+                if (currency === 'inr') {
+                    purchasePrice = purchasePrice / conversionRate;
+                }
+                
+                // Validate inputs
+                if (isNaN(purchasePrice) || purchasePrice <= 0) {
+                    alert("Please enter a valid purchase price (greater than 0)");
+                    return;
+                }
+                
+                if (isNaN(carAge) || carAge < 0) {
+                    alert("Please enter a valid car age (0 or greater)");
+                    return;
+                }
+                
+                if (isNaN(depreciationRate) || depreciationRate <= 0) {
+                    alert("Please enter a valid depreciation rate (greater than 0)");
+                    return;
+                }
+                
+                if (isNaN(years) || years <= 0) {
+                    alert("Please enter a valid projection period (greater than 0)");
+                    return;
+                }
+                
+                // Calculate current value
+                let currentVal = purchasePrice;
+                for (let i = 0; i < carAge; i++) {
+                    currentVal *= (1 - depreciationRate / 100);
+                }
+                
+                // Calculate future value
+                let futureVal = currentVal;
+                for (let i = 0; i < years; i++) {
+                    futureVal *= (1 - depreciationRate / 100);
+                }
+                
+                // Calculate values for chart
+                const chartYears = Math.min(5, years + carAge);
+                const chartData = [];
+                let chartVal = purchasePrice;
+                
+                for (let i = 0; i <= chartYears; i++) {
+                    chartData.push(chartVal);
+                    if (i < chartYears) {
+                        chartVal *= (1 - depreciationRate / 100);
+                    }
+                }
+                
+                // Generate chart
+                generateChart(chartData, chartYears);
+                
+                // Display results
+                currentValue.textContent = formatCurrency(currentVal);
+                totalDepreciation.textContent = formatCurrency(purchasePrice - currentVal);
+                futureValue.textContent = formatCurrency(futureVal);
+                annualDepreciation.textContent = formatCurrency((currentVal * depreciationRate) / 100);
+                
+                // Show result section
+                resultDiv.style.display = 'block';
+            }
+            
+            function generateChart(data, years) {
+                // Clear previous chart
+                depreciationChart.innerHTML = '';
+                
+                // Find max value for scaling
+                const maxValue = Math.max(...data);
+                
+                // Create bars
+                for (let i = 0; i <= years; i++) {
+                    const barHeight = (data[i] / maxValue) * 100;
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    bar.style.height = `${barHeight}%`;
+                    
+                    const valueLabel = document.createElement('div');
+                    valueLabel.className = 'chart-value';
+                    valueLabel.textContent = formatCurrency(data[i]);
+                    
+                    const yearLabel = document.createElement('div');
+                    yearLabel.className = 'chart-bar-label';
+                    yearLabel.textContent = `Year ${i}`;
+                    
+                    bar.appendChild(valueLabel);
+                    bar.appendChild(yearLabel);
+                    depreciationChart.appendChild(bar);
+                    
+                    // Animate the chart
+                    setTimeout(() => {
+                        bar.style.height = `${barHeight}%`;
+                    }, 100 * i);
+                }
+            }
+            
+            // Clear inputs
+            clearBtn.addEventListener('click', function() {
+                if (currency === 'usd') {
+                    purchasePriceInput.value = '25000';
+                } else {
+                    purchasePriceInput.value = '500000';
+                }
+                carAgeInput.value = '3';
+                depreciationRateInput.value = '15';
+                yearsInput.value = '5';
+                resultDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
