@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyre Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0074e4, #00a2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #0074e4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .calculator {
+            padding: 25px;
+        }
+        
+        .measurement-system {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        
+        .system-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: #e6f0ff;
+            transition: all 0.3s;
+        }
+        
+        .system-option.active {
+            background: #0074e4;
+            color: white;
+        }
+        
+        .system-option input {
+            display: none;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        .input-section h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e6f0ff;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .input-group label {
+            flex: 1;
+            font-weight: 600;
+            color: #0074e4;
+        }
+        
+        .input-wrapper {
+            flex: 2;
+            position: relative;
+        }
+        
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #0074e4;
+            outline: none;
+        }
+        
+        .input-wrapper .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+            font-weight: 600;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #calculate-btn {
+            background: #0074e4;
+            color: white;
+        }
+        
+        #calculate-btn:hover {
+            background: #005bb7;
+        }
+        
+        #clear-btn {
+            background: #f2f2f2;
+            color: #333;
+        }
+        
+        #clear-btn:hover {
+            background: #e6e6e6;
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .tyre-size {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0074e4;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .detail-box {
+            flex-basis: 48%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #e6f0ff;
+            border-radius: 8px;
+        }
+        
+        .detail-box h4 {
+            color: #0074e4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-box p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 22px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .input-wrapper {
+                width: 100%;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .details {
+                flex-direction: column;
+            }
+            
+            .detail-box {
+                flex-basis: 100%;
+            }
+            
+            .tyre-size {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tachometer-alt icon"></i>Tyre Size Calculator</h1>
+            <p>Calculate tyre dimensions, circumference, and revolutions per km/mile</p>
+        </div>
+        
+        <div class="calculator">
+            <div class="measurement-system">
+                <label class="system-option active" id="metric-option">
+                    <input type="radio" name="system" value="metric" checked> 
+                    Metric (mm)
+                </label>
+                <label class="system-option" id="imperial-option">
+                    <input type="radio" name="system" value="imperial"> 
+                    Imperial (inches)
+                </label>
+            </div>
+            
+            <div class="input-section">
+                <h3><i class="fas fa-cog"></i> Tyre Specifications</h3>
+                
+                <div class="input-group">
+                    <label for="width"><i class="fas fa-arrows-alt-h"></i> Width</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="width" placeholder="Enter width" value="205">
+                        <span class="unit" id="width-unit">mm</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="aspect-ratio"><i class="fas fa-percent"></i> Aspect Ratio</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="aspect-ratio" placeholder="Enter ratio" value="55">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="rim-diameter"><i class="fas fa-circle"></i> Rim Diameter</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="rim-diameter" placeholder="Enter diameter" value="16">
+                        <span class="unit" id="diameter-unit">inches</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn">Calculate</button>
+                <button id="clear-btn">Clear</button>
+            </div>
+            
+            <div class="result" id="result">
+                <h3>Tyre Size Calculation</h3>
+                <div class="tyre-size" id="tyre-size-value">205/55 R16</div>
+                
+                <div class="details">
+                    <div class="detail-box">
+                        <h4>Overall Diameter</h4>
+                        <p id="overall-diameter">0 mm</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Circumference</h4>
+                        <p id="circumference">0 mm</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Revolutions per km</h4>
+                        <p id="revs-km">0</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Revolutions per mile</h4>
+                        <p id="revs-mile">0</p>
+                    </div>
+                </div>
+                
+                <p class="info-text">This calculation helps in understanding tyre specifications and their impact on your vehicle.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const metricOption = document.getElementById('metric-option');
+            const imperialOption = document.getElementById('imperial-option');
+            const widthInput = document.getElementById('width');
+            const aspectRatioInput = document.getElementById('aspect-ratio');
+            const rimDiameterInput = document.getElementById('rim-diameter');
+            const widthUnit = document.getElementById('width-unit');
+            const diameterUnit = document.getElementById('diameter-unit');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultDiv = document.getElementById('result');
+            const tyreSizeValue = document.getElementById('tyre-size-value');
+            const overallDiameter = document.getElementById('overall-diameter');
+            const circumference = document.getElementById('circumference');
+            const revsKm = document.getElementById('revs-km');
+            const revsMile = document.getElementById('revs-mile');
+            
+            // Set initial values
+            let measurementSystem = 'metric';
+            
+            // Measurement system change handler
+            metricOption.addEventListener('click', function() {
+                measurementSystem = 'metric';
+                updateMeasurementSystem();
+                metricOption.classList.add('active');
+                imperialOption.classList.remove('active');
+            });
+            
+            imperialOption.addEventListener('click', function() {
+                measurementSystem = 'imperial';
+                updateMeasurementSystem();
+                imperialOption.classList.add('active');
+                metricOption.classList.remove('active');
+            });
+            
+            function updateMeasurementSystem() {
+                if (measurementSystem === 'metric') {
+                    widthUnit.textContent = 'mm';
+                    diameterUnit.textContent = 'inches';
+                    widthInput.placeholder = 'Enter width';
+                    widthInput.value = '205';
+                    aspectRatioInput.value = '55';
+                    rimDiameterInput.value = '16';
+                } else {
+                    widthUnit.textContent = 'inches';
+                    diameterUnit.textContent = 'inches';
+                    widthInput.placeholder = 'Enter width';
+                    widthInput.value = '8';
+                    aspectRatioInput.value = '70';
+                    rimDiameterInput.value = '15';
+                }
+                
+                // Recalculate if results are shown
+                if (resultDiv.style.display === 'block') {
+                    calculateTyreSize();
+                }
+            }
+            
+            // Format measurement based on system
+            function formatMeasurement(value, unit) {
+                if (measurementSystem === 'metric' && unit === 'length') {
+                    return `${value.toFixed(0)} mm`;
+                } else if (measurementSystem === 'imperial' && unit === 'length') {
+                    return `${value.toFixed(2)} inches`;
+                } else if (unit === 'revs') {
+                    return `${value.toFixed(0)}`;
+                }
+                return value;
+            }
+            
+            // Calculate tyre size on button click
+            calculateBtn.addEventListener('click', calculateTyreSize);
+            
+            function calculateTyreSize() {
+                const width = parseFloat(widthInput.value);
+                const aspectRatio = parseFloat(aspectRatioInput.value);
+                const rimDiameter = parseFloat(rimDiameterInput.value);
+                
+                // Validate inputs
+                if (isNaN(width) || width <= 0) {
+                    alert("Please enter a valid tyre width (greater than 0)");
+                    return;
+                }
+                
+                if (isNaN(aspectRatio) || aspectRatio <= 0) {
+                    alert("Please enter a valid aspect ratio (greater than 0)");
+                    return;
+                }
+                
+                if (isNaN(rimDiameter) || rimDiameter <= 0) {
+                    alert("Please enter a valid rim diameter (greater than 0)");
+                    return;
+                }
+                
+                let sidewallHeight, overallDia, circ, revsPerKm, revsPerMile;
+                
+                if (measurementSystem === 'metric') {
+                    // Metric calculation (width in mm)
+                    sidewallHeight = (width * aspectRatio) / 100;
+                    overallDia = (rimDiameter * 25.4) + (2 * sidewallHeight);
+                    circ = overallDia * Math.PI;
+                    revsPerKm = 1000000 / circ; // 1km = 1,000,000mm
+                    revsPerMile = 1609344 / circ; // 1mile = 1,609,344mm
+                    
+                    // Display tyre size in metric format
+                    tyreSizeValue.textContent = `${width}/${aspectRatio} R${rimDiameter}`;
+                } else {
+                    // Imperial calculation (width in inches)
+                    sidewallHeight = (width * aspectRatio) / 100;
+                    overallDia = rimDiameter + (2 * sidewallHeight);
+                    circ = overallDia * Math.PI;
+                    revsPerKm = 100000 / (circ * 2.54); // Convert circumference to cm and calculate
+                    revsPerMile = 63360 / circ; // 1mile = 63,360 inches
+                    
+                    // Display tyre size in imperial format
+                    tyreSizeValue.textContent = `${width.toFixed(1)}/${aspectRatio} R${rimDiameter}`;
+                }
+                
+                // Display results
+                overallDiameter.textContent = formatMeasurement(overallDia, 'length');
+                circumference.textContent = formatMeasurement(circ, 'length');
+                revsKm.textContent = formatMeasurement(revsPerKm, 'revs');
+                revsMile.textContent = formatMeasurement(revsPerMile, 'revs');
+                
+                // Show result section
+                resultDiv.style.display = 'block';
+            }
+            
+            // Clear inputs
+            clearBtn.addEventListener('click', function() {
+                if (measurementSystem === 'metric') {
+                    widthInput.value = '205';
+                    aspectRatioInput.value = '55';
+                    rimDiameterInput.value = '16';
+                } else {
+                    widthInput.value = '8';
+                    aspectRatioInput.value = '70';
+                    rimDiameterInput.value = '15';
+                }
+                resultDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
