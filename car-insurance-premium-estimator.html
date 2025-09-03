@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Insurance Premium Estimator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0074e4, #00a2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #0074e4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .currency-selector {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 20px;
+        }
+        
+        .currency-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #e6f0ff;
+            transition: all 0.3s;
+        }
+        
+        .currency-option.active {
+            background: #0074e4;
+            color: white;
+        }
+        
+        .currency-option input {
+            display: none;
+        }
+        
+        .calculator {
+            padding: 25px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e6f0ff;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0074e4;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #0074e4;
+            outline: none;
+        }
+        
+        .input-wrapper .icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+        }
+        
+        .input-wrapper .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0074e4;
+            font-weight: 600;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-item input {
+            margin-right: 8px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #calculate-btn {
+            background: #0074e4;
+            color: white;
+        }
+        
+        #calculate-btn:hover {
+            background: #005bb7;
+        }
+        
+        #clear-btn {
+            background: #f2f2f2;
+            color: #333;
+        }
+        
+        #clear-btn:hover {
+            background: #e6e6e6;
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result h3 {
+            color: #0074e4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .premium {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0074e4;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .detail-box {
+            flex-basis: 48%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #e6f0ff;
+            border-radius: 8px;
+        }
+        
+        .detail-box h4 {
+            color: #0074e4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-box p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .details {
+                flex-direction: column;
+            }
+            
+            .detail-box {
+                flex-basis: 100%;
+            }
+            
+            .premium {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-car-crash icon"></i>Car Insurance Premium Estimator</h1>
+            <p>Get an estimate of your car insurance premium</p>
+        </div>
+        
+        <div class="currency-selector">
+            <label class="currency-option active" id="usd-option">
+                <input type="radio" name="currency" value="usd" checked> 
+                <i class="fas fa-dollar-sign"></i> USD
+            </label>
+            <label class="currency-option" id="inr-option">
+                <input type="radio" name="currency" value="inr"> 
+                <i class="fas fa-rupee-sign"></i> INR
+            </label>
+        </div>
+        
+        <div class="calculator">
+            <div class="form-section">
+                <h3><i class="fas fa-car"></i> Vehicle Details</h3>
+                
+                <div class="input-group">
+                    <label for="car-value"><i class="fas fa-dollar-sign"></i> Car Value</label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol" id="value-symbol">$</span>
+                        <input type="number" id="car-value" placeholder="Enter car value" value="25000">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="car-type"><i class="fas fa-car"></i> Car Type</label>
+                    <div class="input-wrapper">
+                        <select id="car-type">
+                            <option value="hatchback">Hatchback</option>
+                            <option value="sedan">Sedan</option>
+                            <option value="suv">SUV</option>
+                            <option value="luxury">Luxury Vehicle</option>
+                            <option value="sports">Sports Car</option>
+                        </select>
+                        <i class="fas fa-chevron-down icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="car-age"><i class="fas fa-calendar-alt"></i> Car Age (years)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="car-age" placeholder="Enter car age" value="3" min="0" max="30">
+                        <i class="fas fa-calendar-alt icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3><i class="fas fa-user"></i> Driver Details</h3>
+                
+                <div class="input-group">
+                    <label for="driver-age"><i class="fas fa-user"></i> Driver Age</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="driver-age" placeholder="Enter driver age" value="35" min="18" max="100">
+                        <i class="fas fa-user icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="driving-experience"><i class="fas fa-id-card"></i> Driving Experience (years)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="driving-experience" placeholder="Enter driving experience" value="10" min="0" max="82">
+                        <i class="fas fa-id-card icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-history"></i> Driving History</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accidents">
+                            <label for="accidents">Accidents in last 3 years</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="violations">
+                            <label for="violations">Traffic violations</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3><i class="fas fa-shield-alt"></i> Coverage Options</h3>
+                
+                <div class="input-group">
+                    <label for="coverage-type"><i class="fas fa-shield-alt"></i> Coverage Type</label>
+                    <div class="input-wrapper">
+                        <select id="coverage-type">
+                            <option value="basic">Basic Liability</option>
+                            <option value="standard" selected>Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="comprehensive">Comprehensive</option>
+                        </select>
+                        <i class="fas fa-chevron-down icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="deductible"><i class="fas fa-file-invoice-dollar"></i> Deductible Amount</label>
+                    <div class="input-wrapper">
+                        <select id="deductible">
+                            <option value="250">$250 / ₹10,000</option>
+                            <option value="500" selected>$500 / ₹20,000</option>
+                            <option value="1000">$1,000 / ₹40,000</option>
+                            <option value="2000">$2,000 / ₹80,000</option>
+                        </select>
+                        <i class="fas fa-chevron-down icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn">Calculate Premium</button>
+                <button id="clear-btn">Clear</button>
+            </div>
+            
+            <div class="result" id="result">
+                <h3>Estimated Annual Premium</h3>
+                <div class="premium" id="premium-value">$0.00</div>
+                
+                <div class="details">
+                    <div class="detail-box">
+                        <h4>Base Premium</h4>
+                        <p id="base-premium">$0.00</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Vehicle Age Factor</h4>
+                        <p id="age-factor">0%</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Driver Factor</h4>
+                        <p id="driver-factor">0%</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Coverage Factor</h4>
+                        <p id="coverage-factor">0%</p>
+                    </div>
+                </div>
+                
+                <p class="info-text">This is an estimate only. Actual premiums may vary based on additional factors.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const carValueInput = document.getElementById('car-value');
+            const carTypeSelect = document.getElementById('car-type');
+            const carAgeInput = document.getElementById('car-age');
+            const driverAgeInput = document.getElementById('driver-age');
+            const drivingExpInput = document.getElementById('driving-experience');
+            const accidentsCheckbox = document.getElementById('accidents');
+            const violationsCheckbox = document.getElementById('violations');
+            const coverageTypeSelect = document.getElementById('coverage-type');
+            const deductibleSelect = document.getElementById('deductible');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultDiv = document.getElementById('result');
+            const premiumValue = document.getElementById('premium-value');
+            const basePremium = document.getElementById('base-premium');
+            const ageFactor = document.getElementById('age-factor');
+            const driverFactor = document.getElementById('driver-factor');
+            const coverageFactor = document.getElementById('coverage-factor');
+            const usdOption = document.getElementById('usd-option');
+            const inrOption = document.getElementById('inr-option');
+            const valueSymbol = document.getElementById('value-symbol');
+            
+            // Set initial values
+            let currency = 'usd';
+            let currencySymbol = '$';
+            let conversionRate = 75; // USD to INR conversion rate
+            
+            // Currency selection
+            usdOption.addEventListener('click', function() {
+                currency = 'usd';
+                currencySymbol = '$';
+                valueSymbol.textContent = '$';
+                updateCurrencyDisplay();
+                usdOption.classList.add('active');
+                inrOption.classList.remove('active');
+            });
+            
+            inrOption.addEventListener('click', function() {
+                currency = 'inr';
+                currencySymbol = '₹';
+                valueSymbol.textContent = '₹';
+                updateCurrencyDisplay();
+                inrOption.classList.add('active');
+                usdOption.classList.remove('active');
+            });
+            
+            function updateCurrencyDisplay() {
+                // Update car value placeholder and default based on currency
+                if (currency === 'inr') {
+                    carValueInput.placeholder = "Enter car value";
+                    if (carValueInput.value === "25000") {
+                        carValueInput.value = "500000";
+                    }
+                } else {
+                    carValueInput.placeholder = "Enter car value";
+                    if (carValueInput.value === "500000") {
+                        carValueInput.value = "25000";
+                    }
+                }
+                
+                // Update deductible options
+                const deductibleOptions = deductibleSelect.options;
+                if (currency === 'inr') {
+                    deductibleOptions[0].text = "₹10,000";
+                    deductibleOptions[1].text = "₹20,000";
+                    deductibleOptions[2].text = "₹40,000";
+                    deductibleOptions[3].text = "₹80,000";
+                } else {
+                    deductibleOptions[0].text = "$250";
+                    deductibleOptions[1].text = "$500";
+                    deductibleOptions[2].text = "$1,000";
+                    deductibleOptions[3].text = "$2,000";
+                }
+                
+                // Recalculate if results are already shown
+                if (resultDiv.style.display === 'block') {
+                    calculatePremium();
+                }
+            }
+            
+            // Format currency based on selection
+            function formatCurrency(amount) {
+                if (currency === 'inr') {
+                    // Convert if amount is in USD (assuming calculations are done in USD)
+                    const inrAmount = amount * conversionRate;
+                    
+                    // Indian formatting (lakhs and crores)
+                    if (inrAmount >= 10000000) {
+                        return '₹' + (inrAmount / 10000000).toFixed(2) + ' Cr';
+                    } else if (inrAmount >= 100000) {
+                        return '₹' + (inrAmount / 100000).toFixed(2) + ' L';
+                    } else {
+                        return '₹' + inrAmount.toLocaleString('en-IN', {maximumFractionDigits: 0});
+                    }
+                } else {
+                    // US formatting
+                    return '$' + amount.toLocaleString('en-US', {maximumFractionDigits: 2});
+                }
+            }
+            
+            // Calculate premium on button click
+            calculateBtn.addEventListener('click', calculatePremium);
+            
+            function calculatePremium() {
+                // Get input values
+                let carValue = parseFloat(carValueInput.value);
+                const carType = carTypeSelect.value;
+                const carAge = parseInt(carAgeInput.value);
+                const driverAge = parseInt(driverAgeInput.value);
+                const drivingExp = parseInt(drivingExpInput.value);
+                const hasAccidents = accidentsCheckbox.checked;
+                const hasViolations = violationsCheckbox.checked;
+                const coverageType = coverageTypeSelect.value;
+                const deductible = parseInt(deductibleSelect.value);
+                
+                // Convert car value to USD for calculations if in INR
+                if (currency === 'inr') {
+                    carValue = carValue / conversionRate;
+                }
+                
+                // Validate inputs
+                if (isNaN(carValue) || carValue <= 0) {
+                    alert("Please enter a valid car value (greater than 0)");
+                    return;
+                }
+                
+                if (isNaN(carAge) || carAge < 0) {
+                    alert("Please enter a valid car age (0 or greater)");
+                    return;
+                }
+                
+                if (isNaN(driverAge) || driverAge < 18) {
+                    alert("Please enter a valid driver age (18 or greater)");
+                    return;
+                }
+                
+                if (isNaN(drivingExp) || drivingExp < 0) {
+                    alert("Please enter a valid driving experience (0 or greater)");
+                    return;
+                }
+                
+                // Calculate base premium (1.5% of car value)
+                let calculatedPremium = carValue * 0.015;
+                
+                // Apply car type factor
+                let carTypeFactor = 0;
+                switch(carType) {
+                    case 'suv':
+                        carTypeFactor = 0.1;
+                        break;
+                    case 'luxury':
+                        carTypeFactor = 0.25;
+                        break;
+                    case 'sports':
+                        carTypeFactor = 0.3;
+                        break;
+                    case 'hatchback':
+                        carTypeFactor = -0.05;
+                        break;
+                    default:
+                        carTypeFactor = 0;
+                }
+                calculatedPremium *= (1 + carTypeFactor);
+                
+                // Apply car age factor (older cars are cheaper to insure)
+                let calculatedAgeFactor = 0;
+                if (carAge > 10) {
+                    calculatedAgeFactor = -0.2;
+                } else if (carAge > 5) {
+                    calculatedAgeFactor = -0.1;
+                } else if (carAge > 3) {
+                    calculatedAgeFactor = 0;
+                } else {
+                    calculatedAgeFactor = 0.1;
+                }
+                calculatedPremium *= (1 + calculatedAgeFactor);
+                
+                // Apply driver age factor
+                let calculatedDriverFactor = 0;
+                if (driverAge < 25) {
+                    calculatedDriverFactor = 0.25;
+                } else if (driverAge > 65) {
+                    calculatedDriverFactor = 0.15;
+                } else {
+                    calculatedDriverFactor = -0.1;
+                }
+                calculatedPremium *= (1 + calculatedDriverFactor);
+                
+                // Apply driving experience factor
+                let experienceFactor = 0;
+                if (drivingExp < 3) {
+                    experienceFactor = 0.2;
+                } else if (drivingExp > 10) {
+                    experienceFactor = -0.1;
+                }
+                calculatedPremium *= (1 + experienceFactor);
+                
+                // Apply driving history factors
+                if (hasAccidents) {
+                    calculatedPremium *= 1.25;
+                }
+                if (hasViolations) {
+                    calculatedPremium *= 1.15;
+                }
+                
+                // Apply coverage type factor
+                let calculatedCoverageFactor = 0;
+                switch(coverageType) {
+                    case 'basic':
+                        calculatedCoverageFactor = -0.3;
+                        break;
+                    case 'standard':
+                        calculatedCoverageFactor = 0;
+                        break;
+                    case 'premium':
+                        calculatedCoverageFactor = 0.2;
+                        break;
+                    case 'comprehensive':
+                        calculatedCoverageFactor = 0.4;
+                        break;
+                }
+                calculatedPremium *= (1 + calculatedCoverageFactor);
+                
+                // Apply deductible factor
+                let deductibleFactor = 0;
+                switch(deductible) {
+                    case 250:
+                        deductibleFactor = 0.15;
+                        break;
+                    case 500:
+                        deductibleFactor = 0;
+                        break;
+                    case 1000:
+                        deductibleFactor = -0.1;
+                        break;
+                    case 2000:
+                        deductibleFactor = -0.2;
+                        break;
+                }
+                calculatedPremium *= (1 + deductibleFactor);
+                
+                // Ensure premium is reasonable
+                if (calculatedPremium < 100) calculatedPremium = 100;
+                
+                // Display results with proper formatting
+                premiumValue.textContent = formatCurrency(calculatedPremium);
+                basePremium.textContent = formatCurrency(carValue * 0.015);
+                ageFactor.textContent = `${(calculatedAgeFactor * 100).toFixed(0)}%`;
+                driverFactor.textContent = `${(calculatedDriverFactor * 100).toFixed(0)}%`;
+                coverageFactor.textContent = `${(calculatedCoverageFactor * 100).toFixed(0)}%`;
+                
+                // Show result section
+                resultDiv.style.display = 'block';
+            }
+            
+            // Clear inputs
+            clearBtn.addEventListener('click', function() {
+                if (currency === 'usd') {
+                    carValueInput.value = '25000';
+                } else {
+                    carValueInput.value = '500000';
+                }
+                carTypeSelect.value = 'hatchback';
+                carAgeInput.value = '3';
+                driverAgeInput.value = '35';
+                drivingExpInput.value = '10';
+                accidentsCheckbox.checked = false;
+                violationsCheckbox.checked = false;
+                coverageTypeSelect.value = 'standard';
+                deductibleSelect.value = '500';
+                resultDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
